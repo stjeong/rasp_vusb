@@ -51,9 +51,9 @@ Steps - Installation
 
 How to Test
 ================================
-Now, you can run "InputController.exe" on your Windows PC. As soon as run, it will find "usb_server" program which is run in Raspberry PI and connect it automatically.
+Now, you can run "InputController.exe (from /bin/v1_0_0_0/InputController.zip)" on your Windows PC. As soon as run, it will find "usb_server" program which is run in Raspberry PI and connect it automatically.
 
-At first, InputController parse input as mouse data. So you move to specific position but need to calculate. If you move to x = 50, y = 100 and your monitor's resolution is 1920 * 1080, your input has to be like this,
+At first, InputController parse input as mouse data. So you can move to specific position as whatever you want but need to calculate for your circumstances. If you move to x = 50, y = 100 and your monitor's resolution is 1920 * 1080, your input has to be like this,
 
 ```
 x = 50 * 32767 / 1920 = 853
@@ -80,22 +80,22 @@ And control wheel on the mouse with 'w' prefix to offset value.
 w10
 ```
 
-it acts as scrolling down, or type "w-50" to scroll up with offset 50.
+It acts as scrolling down, or type "w-50" to scroll up with offset 50.
 
-Test it as keyboard with this command,
+For testing input as keyboard, change the mode by typing "--mode" command,
 
 ```
 --mode
 ```
 (If you type "--mode" again, it will change to mouse input mode)
 
-Now you can enter any text and just hit enter,
+Now you can type any text and just hit ENTER,
 
 ```
 test is good
 ```
 
-Your PC will accept "test is good" key inputs. Of cource, you can send any special inputs of these,
+then, your PC will accept "test is good" key inputs. Of course, you can send any special inputs of these,
 
 ```
 Left Window key: <window>
