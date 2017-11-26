@@ -1,0 +1,10 @@
+[Unit]
+Description=Create Mouse/Keyboard USB gadgets
+
+[Service]
+Type=oneshot
+ExecStart=/share/triple_usb_device.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

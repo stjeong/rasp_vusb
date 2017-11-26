@@ -1,0 +1,10 @@
+#pragma once
+
+
+#define PORT 19508
+#define IP_FOUND "FIND_VUSB_DEVICE"
+#define IP_FOUND_ACK "VUSB_DEVICE_FOUND_ACK"
+
+#define KEYBOARD_INPUT_CMD 0x05
+#define REL_MOUSE_INPUT_CMD 0x06
+#define ABS_MOUSE_INPUT_CMD 0x07

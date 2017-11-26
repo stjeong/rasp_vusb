@@ -1,0 +1,10 @@
+[Unit]
+Description=Service for Mouse/Keyboard USB gadgets
+After=create-triple-usb.service
+
+[Service]
+Type=forking
+ExecStart=/share/rasp_vusb_server.out
+
+[Install]
+WantedBy=multi-user.target
