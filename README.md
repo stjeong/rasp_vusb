@@ -36,12 +36,7 @@ Steps - Installation
     $ sudo reboot
     ```
 
-7. Finally, connect your Raspberry PI zero to your Computer then reboot Raspberry PI zero.
-    ```
-    $ sudo reboot
-    ```
-
-8. For windows user, go to your "Control panel" / "Device Manager", you can find 3 new devices.
+7. Finally, connect your Raspberry PI zero to your Computer. Go to your "Control panel" / "Device Manager", you can find 3 new devices.
     ```
     Human Interface Devices
         * USB Input Device
