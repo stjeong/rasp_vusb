@@ -1,6 +1,6 @@
 What is it?
 ================================
-This repo explains how to turn your Raspberry Pi Zero into USB Keyboard and Mouse. Also provides sample code and binaries.
+This repo explains how to turn your Raspberry Pi Zero into USB Keyboard and Mouse. Also provides sample code and binaries to control them.
 
 Steps - Installation
 ================================
