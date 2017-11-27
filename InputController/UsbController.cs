@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace InputController
 {
@@ -17,7 +15,6 @@ namespace InputController
         FindService _findService;
         Socket _controlSocket;
 
-        bool _activeFindService = false;
         KeyboardDevice _keyboard;
         MouseDevice _mouse;
 
@@ -39,7 +36,6 @@ namespace InputController
 
         public void ActivateFindService()
         {
-            _activeFindService = true;
             _findService.Run();
         }
 
@@ -77,6 +73,21 @@ namespace InputController
                     Console.WriteLine("NO listening server: " + remote);
                 }
             }
+        }
+
+        public void Shutdown()
+        {
+            List<byte> buf = new List<byte>();
+
+            buf.Add(1);
+            buf.Add(0);
+            buf.Add(0);
+            buf.Add(0);
+
+            buf.Add(0x04); // SHUTDOWN_SHELL_CMD
+            Send(buf.ToArray());
+
+            CloseSocket();
         }
 
         void Send(byte[] buffer)
@@ -127,11 +138,6 @@ namespace InputController
             Console.WriteLine("Socket is disconnected");
             _controlSocket.Close();
             _controlSocket = null;
-
-            if (_activeFindService == true)
-            {
-                ActivateFindService();
-            }
         }
 
         private void ControlSend_Completed(object sender, SocketAsyncEventArgs e)

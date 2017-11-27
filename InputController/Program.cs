@@ -1,46 +1,88 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace InputController
 {
     class Program
     {
         EventWaitHandle _ewh = new EventWaitHandle(false, EventResetMode.ManualReset);
+        EventWaitHandle _exitEvent;
+        UsbController _usbController = new UsbController();
+        bool _exit;
 
         static void Main(string[] args)
         {
             Program pg = new Program();
+            if (pg.WaitForExit(args) == true)
+            {
+                return;
+            }
+
             pg.TestService();
+        }
+
+        private bool WaitForExit(string[] args)
+        {
+            if (args.Length >= 1 && args[0] == "/exit")
+            {
+                new EventWaitHandle(false, EventResetMode.ManualReset, typeof(Program).Name).Set();
+
+                int delay = 15;
+                while (delay -- > 0)
+                {
+                    Console.Write(".");
+                    Thread.Sleep(1000);
+                }
+
+                Console.WriteLine();
+                return true;
+            }
+            else
+            {
+                _exitEvent = new EventWaitHandle(false, EventResetMode.ManualReset, typeof(Program).Name);
+
+                Thread waitThread = new Thread(ExitProcess);
+                waitThread.IsBackground = true;
+                waitThread.Start();
+                return false;
+            }
+
+            void ExitProcess(object eventHandle)
+            {
+                if (_exitEvent.WaitOne() == true)
+                {
+                    _exit = true;
+                    _usbController.Shutdown();
+
+                    Console.WriteLine("Shutdown signaled");
+                }
+            }
         }
 
         private void TestService()
         {
-            UsbController usbController = new UsbController();
-
-            usbController.Connected += UsbController_Connected;
-            usbController.ActivateFindService();
+            _usbController.Connected += UsbController_Connected;
+            _usbController.ActivateFindService();
 
             bool mouseMode = true;
 
-            _ewh.WaitOne();
-            _ewh.Reset();
+            int cmdIndex = EventWaitHandle.WaitAny(new WaitHandle[] { _exitEvent, _ewh });
+            if (cmdIndex == 0)
+            {
+                return;
+            }
 
-            while (true)
+            while (_exit == false)
             {
                 if (mouseMode == false)
                 {
-                    KeyboardTest(usbController);
+                    KeyboardTest();
                     mouseMode = true;
                 }
                 else
                 {
-                    MouseTest(usbController);
+                    MouseTest();
                     mouseMode = false;
                 }
             }
@@ -51,73 +93,98 @@ namespace InputController
             _ewh.Set();
         }
 
-        private static void MouseTest(UsbController usbController)
+        private void MouseTest()
         {
             while (true)
             {
                 Console.Write("Mouse> ");
                 string text = Console.ReadLine();
-                if (text == "--mode")
+
+                if (ProcessMetaCmd(text) == false)
                 {
                     return;
                 }
 
-                usbController.MoveText(text);
+                _usbController.MoveText(text);
             }
         }
 
-        private static void KeyboardTest(UsbController usbController)
+        bool ProcessMetaCmd(string text)
+        {
+            switch (text)
+            {
+                case null:
+                    _exit = text == null;
+                    return false;
+
+                case "--mode":
+                    return false;
+
+                case "--shutdown":
+                    _usbController.Shutdown();
+                    _exit = true;
+                    return false;
+
+                case "--exit":
+                    _exit = true;
+                    return false;
+            }
+
+            return true;
+        }
+
+        private void KeyboardTest()
         {
             //{
             //    string txt = "abc+*()<ime>xptmxm<ime>";
-            //    usbController.SendText(txt + Environment.NewLine);
+            //    _usbController.SendText(txt + Environment.NewLine);
             //}
 
             //{
             //    string txt = "<shift_down>abc<shift_up>";
-            //    usbController.SendText(txt + Environment.NewLine);
+            //    _usbController.SendText(txt + Environment.NewLine);
             //}
 
             //{
             //    string txt = "<ctrl_down><esc><ctrl_up>";
-            //    usbController.SendText(txt);
+            //    _usbController.SendText(txt);
             //}
 
             //{
             //    string txt = "<capslock>test is good<capslock><return>";
-            //    usbController.SendText(txt);
+            //    _usbController.SendText(txt);
             //}
 
             //{
             //    string txt = "<ctrl_down><shift_down><esc><shift_up><ctrl_up>";
-            //    usbController.SendText(txt);
+            //    _usbController.SendText(txt);
             //}
 
             while (true)
             {
                 Console.Write("Keyboard> ");
-                string txt = Console.ReadLine();
+                string text = Console.ReadLine();
 
-                if (txt == "--mode")
+                if (ProcessMetaCmd(text) == false)
                 {
                     return;
                 }
 
-                if (txt.StartsWith("connect") == true)
+                if (text.StartsWith("connect") == true)
                 {
-                    string[] connectParams = txt.Split();
-                    usbController.Connect(connectParams[1], short.Parse(connectParams[2]));
+                    string[] connectParams = text.Split();
+                    _usbController.Connect(connectParams[1], short.Parse(connectParams[2]));
                     continue;
                 }
 
-                usbController.SendText(txt);
+                _usbController.SendText(text);
             }
 
             //while (true)
             //{
             //    ConsoleKeyInfo key = Console.ReadKey();
 
-            //    usbController.SendChar(key);
+            //    _usbController.SendChar(key);
             //}
 
             //while (true)
@@ -139,7 +206,7 @@ namespace InputController
             //    buf.Add(0);
             //    buf.Add(0);
 
-            //    usbController.SendKeyRawBuffer(buf.ToArray());
+            //    _usbController.SendKeyRawBuffer(buf.ToArray());
             //}
         }
     }

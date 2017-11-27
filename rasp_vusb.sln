@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
+		report_descriptors.txt = report_descriptors.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "script", "script", "{D164D3E1-99EB-41B0-9ADD-581C9EF5FBBF}"
@@ -31,6 +32,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "v1_0_0_0", "v1_0_0_0", "{64
 	ProjectSection(SolutionItems) = preProject
 		bin\v1_0_0_0\InputController.zip = bin\v1_0_0_0\InputController.zip
 		bin\v1_0_0_0\rasp_vusb_server.out = bin\v1_0_0_0\rasp_vusb_server.out
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "v1_0_0_1", "v1_0_0_1", "{FCF6D8FA-049D-42E1-97AF-6157AB7CCAD5}"
+	ProjectSection(SolutionItems) = preProject
+		bin\v1_0_0_1\InputController.zip = bin\v1_0_0_1\InputController.zip
+		bin\v1_0_0_1\rasp_vusb_server.out = bin\v1_0_0_1\rasp_vusb_server.out
 	EndProjectSection
 EndProject
 Global
@@ -89,6 +96,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{649AC977-EBAA-4923-AFF7-111C810E6A53} = {A7008483-C7BB-4ED2-B340-FB258D38E500}
+		{FCF6D8FA-049D-42E1-97AF-6157AB7CCAD5} = {A7008483-C7BB-4ED2-B340-FB258D38E500}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {13FFA6B4-488F-40DD-A649-85132A25784B}

@@ -2,6 +2,13 @@
 #include "stdafx.h"
 #include "UsbEmulator.h"
 
+#if defined(WIN32)
+#else
+#include <iostream>
+#endif
+
+using namespace std;
+
 UsbEmulator::UsbEmulator() : _queue(10)
 {
 }
@@ -96,5 +103,10 @@ void UsbEmulator::ProcessUsbInput(QueueItem buf)
     else if (cmdByte == ABS_MOUSE_INPUT_CMD)
     {
         _mouse.SendAbsolute(_fd, buf.item + 1, buf.itemLen - 1);
+    }
+    else if (cmdByte == SHUTDOWN_SHELL_CMD)
+    {
+        cout << "shutting down..." << endl;
+        system("sudo shutdown -h now");
     }
 }

@@ -11,7 +11,7 @@ FOR /F %%I IN ("%0") DO SET CURRENTDIR=%%~dpI
 pscp %CURRENTDIR%\*.* pi@%PIADDR%:/share
 if errorlevel 1 GOTO ERROR_PSCP
 
-pscp %CURRENTDIR%\..\bin\v1_0_0_0\rasp_vusb_server.out pi@%PIADDR%:/share
+pscp %CURRENTDIR%\..\bin\v1_0_0_1\rasp_vusb_server.out pi@%PIADDR%:/share
 if errorlevel 1 GOTO ERROR_PSCP
 
 GOTO END_OF_SCRIPT
