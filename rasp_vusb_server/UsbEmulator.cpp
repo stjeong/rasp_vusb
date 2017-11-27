@@ -2,11 +2,7 @@
 #include "stdafx.h"
 #include "UsbEmulator.h"
 
-#if defined(WIN32)
-#else
 #include <iostream>
-#endif
-
 using namespace std;
 
 UsbEmulator::UsbEmulator() : _queue(10)

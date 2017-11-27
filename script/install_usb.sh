@@ -18,6 +18,8 @@ if systemctl | grep create-triple-usb; then
 echo exists "create-triple-usb"
 else
 sudo cp /share/create-triple-usb.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl start create-triple-usb
 sudo systemctl enable create-triple-usb
 fi
 
@@ -25,7 +27,7 @@ if systemctl | grep usb_server; then
 echo exists "usb_server"
 else
 sudo cp /share/usb_server.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl start usb_server
 sudo systemctl enable usb_server
 fi
-
-sudo systemctl daemon-reload
