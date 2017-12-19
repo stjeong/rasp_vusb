@@ -1,16 +1,11 @@
 #pragma once
 
-#if defined(WIN32)
-#include <winsock2.h>
-typedef int socklen_t;
-#else
 #include <pthread.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/select.h>
 #include <unistd.h>
-#endif
 
 #include <stdio.h>
 #include <assert.h>
@@ -23,6 +18,10 @@ typedef int socklen_t;
 // On raspberry pi zero,
 // sudo apt-get install g++-4.8 
 #include <thread>
+
+// https://wiki.openssl.org/index.php/Simple_TLS_Server
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
 #include "UsbEmulator.h"
 
@@ -43,6 +42,11 @@ private:
     sockaddr_in _server_addr;
     UsbEmulator _emulator;
 
-    bool ReadData(int socket, char *buf, int len);
+    SSL_CTX *_sslContext;
+
+    bool ReadData(SSL *ssl, char *buf, int len);
+    void init_openssl();
+    void cleanup_openssl();
+    void free_sslctx();
 };
 

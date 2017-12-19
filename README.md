@@ -21,9 +21,10 @@ Steps - Installation
     c:\...\script> deploy_with_pscp.bat 192.168.0.100
     ```
 
-4. On your raspberry pi, make /share/install_usb.sh runnable.
+4. On your raspberry pi, make /share/install_usb.sh and /share/rasp_vusb_server.out runnable.
     ```
     $ sudo chmod +x /share/install_usb.sh
+    $ sudo chmod +x /share/rasp_vusb_server.out
     ```
 
 5. Run install_usb.sh
@@ -53,7 +54,7 @@ Steps - Installation
 
 How to Test
 ================================
-Now, you can run "InputController.exe (from /bin/v1_0_0_1/InputController.zip)" on your Windows PC. As soon as run, it will find "usb_server" program which is run in Raspberry PI and connect it automatically.
+Now, you can run "InputController.exe (from /bin/v1_0_0_2/InputController.zip)" on your Windows PC. As soon as run, it will find "usb_server" program which is run in Raspberry PI and connect it automatically.
 
 At first, InputController parse input as mouse data. So you can move to specific position as whatever you want but need to calculate for your circumstances. If you move to x = 50, y = 100 and your monitor's resolution is 1920 * 1080, your input has to be like this,
 
@@ -155,6 +156,11 @@ $ sudo reboot
 
 Change Log
 ================================
+1.0.0.2 - Dec 20, 2017
+
+* apply ssl socket
+
+
 1.0.0.1 - Oct 13, 2017
 
 * Add "--shutdown" command to shutdown raspberry pi.

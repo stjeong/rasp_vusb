@@ -5,26 +5,25 @@
 VUsbServer::VUsbServer()
 {
     _sock = 0;
+    _sslContext = nullptr;
+
+    init_openssl();
     _emulator.Run();
 }
 
 VUsbServer::~VUsbServer()
 {
     dispose();
+    cleanup_openssl();
 }
 
 void VUsbServer::dispose()
 {
-#if defined(WIN32)
-    ::closesocket(_sock);
-#else
     if (_sock != 0)
     {
         ::close(_sock);
+        _sock = 0;
     }
-#endif
-
-    _sock = 0;
 
     _emulator.Close();
 }
@@ -33,11 +32,7 @@ bool VUsbServer::open()
 {
     _emulator.Open();
 
-#if defined(WIN32)
-    _sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-#else
     _sock = socket(AF_INET, SOCK_STREAM, 0);
-#endif
     if (_sock < 0) {
         perror("VUsbServer::open - sock error\n");
         return false;
@@ -61,13 +56,15 @@ bool VUsbServer::open()
     return true;
 }
 
-bool VUsbServer::ReadData(int socket, char *buf, int len)
+bool VUsbServer::ReadData(SSL *ssl, char *buf, int len)
 {
     int totalRead = len;
 
     while (totalRead > 0)
     {
-        int readBytes = recv(socket, buf, len, 0);
+        // int readBytes = recv(socket, buf, len, 0);
+        int readBytes = SSL_read(ssl, (char *)buf, len);
+
         if (readBytes <= 0)
         {
             break;
@@ -95,7 +92,16 @@ void VUsbServer::startService()
         {
             int clntSocket = accept(_sock, (struct sockaddr *)&server_socket, &addr_len);
 
-            thread clntThread([this](int connectedSocket, UsbEmulator &emulator)
+            SSL *ssl = nullptr;
+            ssl = SSL_new(_sslContext);
+            SSL_set_fd(ssl, clntSocket);
+            int ssl_err = SSL_accept(ssl);
+            if (ssl_err <= 0)
+            {
+                break;
+            }
+
+            thread clntThread([this](int connectedSocket, UsbEmulator &emulator, SSL *pSsl)
             {
                 char buf[4096];
 
@@ -104,7 +110,7 @@ void VUsbServer::startService()
                     memset(buf, 0, sizeof(buf));
 
                     // get length of packet
-                    bool result = ReadData(connectedSocket, buf, 4);
+                    bool result = ReadData(pSsl, buf, 4);
                     if (result == false)
                     {
                         break;
@@ -114,14 +120,15 @@ void VUsbServer::startService()
 
                     if (packetLen > 4096)
                     {
-                        ReadData(connectedSocket, buf, packetLen);
+                        ReadData(pSsl, buf, packetLen);
                         printf("dropped long packet = size(%d)\n", packetLen);
                         break;
                     }
 
-                    result = ReadData(connectedSocket, buf, packetLen);
+                    result = ReadData(pSsl, buf, packetLen);
                     if (result == false)
                     {
+                        printf("can't read = len(%d)\n", packetLen);
                         break;
                     }
 
@@ -135,16 +142,19 @@ void VUsbServer::startService()
                     emulator.Enqueue(buf, packetLen);
                 }
 
+                if (pSsl != nullptr)
+                {
+                    printf("SSL_free\n");
+                    SSL_free(pSsl);
+                    printf("completed: SSL_free\n");
+                }
+
                 if (connectedSocket > 0)
                 {
-#if defined(WIN32)
-                    ::closesocket(connectedSocket);
-#else
                     ::close(connectedSocket);
-#endif
                 }
-                
-            }, clntSocket, std::ref(_emulator));
+
+            }, clntSocket, std::ref(_emulator), ssl);
 
             clntThread.detach();
         }
@@ -152,4 +162,66 @@ void VUsbServer::startService()
     });
 
     t.detach();
+}
+
+void VUsbServer::init_openssl()
+{
+    cout << "init_openssl" << endl;
+
+    SSL_load_error_strings();
+    SSL_library_init();
+    OpenSSL_add_all_algorithms();
+
+    _sslContext = SSL_CTX_new(SSLv23_server_method());
+
+    if (_sslContext != nullptr)
+    {
+        SSL_CTX_set_options(_sslContext, SSL_OP_SINGLE_DH_USE);
+        bool initialized = true;
+
+        do
+        {
+            if (SSL_CTX_use_certificate_file(_sslContext, "/share/test.pem"
+                , SSL_FILETYPE_PEM) <= 0)
+            {
+                cout << "failed: cert file not found" << endl;
+                initialized = false;
+                break;
+            }
+
+            if (SSL_CTX_use_PrivateKey_file(_sslContext, "/share/key.pem"
+                , SSL_FILETYPE_PEM) <= 0)
+            {
+                cout << "failed: private key file not found" << endl;
+                initialized = false;
+                break;
+            }
+
+            cout << "completed: init_openssl" << endl;
+
+        } while (false);
+
+        if (initialized == false)
+        {
+            cout << "failed: init_openssl" << endl;
+            free_sslctx();
+        }
+    }
+}
+
+void VUsbServer::free_sslctx()
+{
+    if (_sslContext != nullptr)
+    {
+        SSL_CTX_free(_sslContext);
+        _sslContext = nullptr;
+    }
+}
+
+void VUsbServer::cleanup_openssl()
+{
+    free_sslctx();
+
+    ERR_free_strings();
+    EVP_cleanup();
 }

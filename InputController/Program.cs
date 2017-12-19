@@ -8,7 +8,7 @@ namespace InputController
     {
         EventWaitHandle _ewh = new EventWaitHandle(false, EventResetMode.ManualReset);
         EventWaitHandle _exitEvent;
-        UsbController _usbController = new UsbController();
+        UsbController _usbController;
         bool _exit;
 
         static void Main(string[] args)
@@ -20,6 +20,11 @@ namespace InputController
             }
 
             pg.TestService();
+        }
+
+        public Program()
+        {
+            _usbController = new UsbController("testserver.com");
         }
 
         private bool WaitForExit(string[] args)

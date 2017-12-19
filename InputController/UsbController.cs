@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 
@@ -13,7 +16,9 @@ namespace InputController
         public const string PACKET_FOUND = "FIND_VUSB_DEVICE";
         public const short ServicePort = 19508;
         FindService _findService;
-        Socket _controlSocket;
+        TcpClient _controlSocket;
+        SslStream _sslStream;
+        string _certName;
 
         KeyboardDevice _keyboard;
         MouseDevice _mouse;
@@ -25,8 +30,9 @@ namespace InputController
             get { return _controlSocket != null; }
         }
 
-        public UsbController()
+        public UsbController(string certName)
         {
+            _certName = certName;
             _keyboard = new KeyboardDevice();
             _mouse = new MouseDevice();
 
@@ -58,12 +64,27 @@ namespace InputController
 
         void ConnectToServer(IPEndPoint remote)
         {
-            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            TcpClient client = new TcpClient();
 
             try
             {
-                socket.Connect(remote);
-                _controlSocket = socket;
+                client.Connect(remote);
+                SslStream sslStream = new SslStream(client.GetStream(), false, validateCertificate, null);
+
+                try
+                {
+                    sslStream.AuthenticateAsClient(_certName);
+                }
+                catch (AuthenticationException e)
+                {
+                    client.Close();
+                    Console.WriteLine(e.ToString());
+                    return;
+                }
+
+                _controlSocket = client;
+                _sslStream = sslStream;
+
                 OnConnected(remote);
             }
             catch (SocketException e)
@@ -73,6 +94,27 @@ namespace InputController
                     Console.WriteLine("NO listening server: " + remote);
                 }
             }
+        }
+
+        private bool validateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            if (sslPolicyErrors == SslPolicyErrors.None)
+            {
+                return true;
+            }
+
+            if (sslPolicyErrors == SslPolicyErrors.RemoteCertificateChainErrors)
+            {
+                if (chain.ChainStatus.Length == 1)
+                {
+                    if (chain.ChainStatus[0].Status == X509ChainStatusFlags.UntrustedRoot)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public void Shutdown()
@@ -90,7 +132,7 @@ namespace InputController
             CloseSocket();
         }
 
-        void Send(byte[] buffer)
+        async void Send(byte[] buffer)
         {
             if (_controlSocket == null)
             {
@@ -98,15 +140,13 @@ namespace InputController
                 return;
             }
 
-            SocketAsyncEventArgs arg = new SocketAsyncEventArgs();
-
-            arg.SetBuffer(buffer, 0, buffer.Length);
-            arg.Completed += ControlSend_Completed;
-
-            bool isAsync = _controlSocket.SendAsync(arg);
-            if (isAsync == false)
+            try
             {
-                ControlSend_Completed(this, arg);
+                await _sslStream.WriteAsync(buffer, 0, buffer.Length);
+            }
+            catch (Exception)
+            {
+                CloseSocket();
             }
         }
 
@@ -138,17 +178,6 @@ namespace InputController
             Console.WriteLine("Socket is disconnected");
             _controlSocket.Close();
             _controlSocket = null;
-        }
-
-        private void ControlSend_Completed(object sender, SocketAsyncEventArgs e)
-        {
-            if (e.BytesTransferred == 0)
-            {
-                if (e.SocketError != SocketError.Success)
-                {
-                    CloseSocket();
-                }
-            }
         }
 
         class FindEndPointArgs : EventArgs

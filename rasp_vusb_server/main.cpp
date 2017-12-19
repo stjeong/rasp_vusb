@@ -3,8 +3,6 @@
 #include "VUsbServer.h"
 #include "IPResolver.h"
 
-#if defined(WIN32)
-#else
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -13,19 +11,9 @@
 #include <unistd.h>
 #include <signal.h>
 #include <linux/limits.h>
-#endif
 
 int work(bool inConsole)
 {
-#if defined(WIN32)
-    inConsole = true;
-
-    WORD wVersionRequested = MAKEWORD(2, 2);
-    WSADATA wsaData;
-
-    ::WSAStartup(wVersionRequested, &wsaData);
-#endif
-
     IPResolver ipResolver;
     VUsbServer usbServer;
 
@@ -49,25 +37,17 @@ int work(bool inConsole)
 
     if (inConsole == true)
     {
-        char response;
         cout << "Press any key to exit..." << endl;
         string s;
         getline(cin, s);
     }
     else
     {
-#if defined(WIN32)
-#else
         while (true)
         {
             sleep(1);
         }
-#endif
     }
-
-#if defined(WIN32)
-    WSACleanup();
-#endif
 
     ipResolver.dispose();
     usbServer.dispose();
@@ -78,8 +58,6 @@ int work(bool inConsole)
 int main(int argc, char **argv)
 {
     bool isConsole = argc >= 2;
-#if defined(WIN32)
-#else
 
     if (isConsole == false)
     {
@@ -97,6 +75,10 @@ int main(int argc, char **argv)
 
         signal(SIGHUP, SIG_IGN);
 
+#if !defined(_NR_OPEN)
+#define NR_OPEN	1024
+#endif
+
         for (int i = 0; i < NR_OPEN; i++)
         {
             close(i);
@@ -110,8 +92,6 @@ int main(int argc, char **argv)
 
         setsid();
     }
-
-#endif
 
     work(isConsole);
 }

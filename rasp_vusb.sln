@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rasp_vusb_server", "rasp_vusb_server\rasp_vusb_server.vcxproj", "{44EE9842-C501-483E-8AF9-6679E03AF400}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InputController", "InputController\InputController.csproj", "{E0523B6E-9F26-46A1-8F67-3A3A886C9BDB}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rasp_vusb_server_test", "rasp_vusb_server_test\rasp_vusb_server_test.vcxproj", "{02B2DCAC-BEA9-4617-952A-47741A93C64E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{807B0BF5-1419-433F-B462-158F88D6477F}"
 	ProjectSection(SolutionItems) = preProject
@@ -18,9 +16,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "script", "script", "{D164D3E1-99EB-41B0-9ADD-581C9EF5FBBF}"
 	ProjectSection(SolutionItems) = preProject
+		script\.editorconfig = script\.editorconfig
 		script\create-triple-usb.service = script\create-triple-usb.service
 		script\deploy_with_pscp.bat = script\deploy_with_pscp.bat
 		script\install_usb.sh = script\install_usb.sh
+		script\key.pem = script\key.pem
+		script\test.pem = script\test.pem
 		script\triple_usb_device.sh = script\triple_usb_device.sh
 		script\uninstall_usb.sh = script\uninstall_usb.sh
 		script\usb_server.service = script\usb_server.service
@@ -39,6 +40,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "v1_0_0_1", "v1_0_0_1", "{FC
 		bin\v1_0_0_1\InputController.zip = bin\v1_0_0_1\InputController.zip
 		bin\v1_0_0_1\rasp_vusb_server.out = bin\v1_0_0_1\rasp_vusb_server.out
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "v1_0_0_2", "v1_0_0_2", "{7FD89216-F730-4901-9B24-67356ED70B3D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,20 +80,6 @@ Global
 		{E0523B6E-9F26-46A1-8F67-3A3A886C9BDB}.Release|x64.Build.0 = Release|Any CPU
 		{E0523B6E-9F26-46A1-8F67-3A3A886C9BDB}.Release|x86.ActiveCfg = Release|Any CPU
 		{E0523B6E-9F26-46A1-8F67-3A3A886C9BDB}.Release|x86.Build.0 = Release|Any CPU
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Debug|ARM.ActiveCfg = Debug|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Debug|ARM.Build.0 = Debug|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Debug|x64.ActiveCfg = Debug|x64
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Debug|x64.Build.0 = Debug|x64
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Debug|x86.ActiveCfg = Debug|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Debug|x86.Build.0 = Debug|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Release|Any CPU.ActiveCfg = Release|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Release|Any CPU.Build.0 = Release|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Release|ARM.ActiveCfg = Release|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Release|x64.ActiveCfg = Release|x64
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Release|x64.Build.0 = Release|x64
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Release|x86.ActiveCfg = Release|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -98,6 +87,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{649AC977-EBAA-4923-AFF7-111C810E6A53} = {A7008483-C7BB-4ED2-B340-FB258D38E500}
 		{FCF6D8FA-049D-42E1-97AF-6157AB7CCAD5} = {A7008483-C7BB-4ED2-B340-FB258D38E500}
+		{7FD89216-F730-4901-9B24-67356ED70B3D} = {A7008483-C7BB-4ED2-B340-FB258D38E500}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {13FFA6B4-488F-40DD-A649-85132A25784B}
