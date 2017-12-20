@@ -1,12 +1,9 @@
 
 #pragma once
 
-#if defined(WIN32)
-#else
 #include <pthread.h>
 #include <fcntl.h>
 #include <unistd.h>
-#endif
 
 #include <stdint.h>
 #include <inttypes.h>

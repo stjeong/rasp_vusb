@@ -12,9 +12,6 @@ MouseDevice::~MouseDevice()
 
 void MouseDevice::SendRelative(int fd, char *mouseInput, int keyLen)
 {
-#if defined(WIN32)
-
-#else
     if (fd <= 0)
     {
         perror("rel mouse: not opened");
@@ -48,14 +45,10 @@ void MouseDevice::SendRelative(int fd, char *mouseInput, int keyLen)
             return;
         }
     }
-#endif
 }
 
 void MouseDevice::SendAbsolute(int fd, char *mouseInput, int keyLen)
 {
-#if defined(WIN32)
-
-#else
     if (fd <= 0)
     {
         perror("abs mouse: not opened");
@@ -77,8 +70,8 @@ void MouseDevice::SendAbsolute(int fd, char *mouseInput, int keyLen)
     item.report_id = 3;
     for (int i = 0; i < keyLen; i += 5)
     {
-        item.x = (mouseInput[i + 0]) | (mouseInput[i + 1] << 8);
-        item.y = (mouseInput[i + 2]) | (mouseInput[i + 3] << 8);
+        item.x = (short)((mouseInput[i + 0]) | (mouseInput[i + 1] << 8));
+        item.y = (short)((mouseInput[i + 2]) | (mouseInput[i + 3] << 8));
         item.wheel = mouseInput[i + 4];
 
         printf("abs mouse: x = %d, y = %d, wheel %d\n", item.x, item.y, item.wheel);
@@ -89,5 +82,4 @@ void MouseDevice::SendAbsolute(int fd, char *mouseInput, int keyLen)
             return;
         }
     }
-#endif
 }

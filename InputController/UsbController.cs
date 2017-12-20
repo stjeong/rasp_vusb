@@ -132,7 +132,7 @@ namespace InputController
             CloseSocket();
         }
 
-        async void Send(byte[] buffer)
+        void Send(byte[] buffer)
         {
             if (_controlSocket == null)
             {
@@ -142,7 +142,8 @@ namespace InputController
 
             try
             {
-                await _sslStream.WriteAsync(buffer, 0, buffer.Length);
+                _sslStream.Write(buffer);
+                _sslStream.Flush();
             }
             catch (Exception)
             {
@@ -175,9 +176,19 @@ namespace InputController
 
         void CloseSocket()
         {
-            Console.WriteLine("Socket is disconnected");
-            _controlSocket.Close();
+            try
+            {
+                _sslStream.Close();
+            } catch { }
+            _sslStream = null;
+
+            try
+            {
+                _controlSocket.Close();
+            } catch { }
             _controlSocket = null;
+
+            Console.WriteLine("Socket is disconnected");
         }
 
         class FindEndPointArgs : EventArgs

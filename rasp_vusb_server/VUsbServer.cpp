@@ -1,11 +1,15 @@
 
 #include "stdafx.h"
+
+#include <libgen.h>
 #include "VUsbServer.h"
 
 VUsbServer::VUsbServer()
 {
     _sock = 0;
     _sslContext = nullptr;
+
+    get_module_path(_modulePath);
 
     init_openssl();
     _emulator.Run();
@@ -15,6 +19,18 @@ VUsbServer::~VUsbServer()
 {
     dispose();
     cleanup_openssl();
+}
+
+void VUsbServer::get_module_path(char modulePath[])
+{
+    char arg1[20];
+    char exepath[PATH_MAX + 1] = { 0 };
+
+    sprintf(arg1, "/proc/%d/exe", getpid());
+    readlink(arg1, exepath, PATH_MAX);
+    strcpy(modulePath, dirname(exepath));
+
+    printf("module path: %s\n", modulePath);
 }
 
 void VUsbServer::dispose()
@@ -174,6 +190,15 @@ void VUsbServer::init_openssl()
 
     _sslContext = SSL_CTX_new(SSLv23_server_method());
 
+#ifdef _DEBUG
+#else
+    char certPath[PATH_MAX];
+    char keyPath[PATH_MAX];
+
+    sprintf(certPath, "%s/%s", _modulePath, "test.pem");
+    sprintf(keyPath, "%s/%s", _modulePath, "key.pem");
+#endif
+
     if (_sslContext != nullptr)
     {
         SSL_CTX_set_options(_sslContext, SSL_OP_SINGLE_DH_USE);
@@ -181,7 +206,12 @@ void VUsbServer::init_openssl()
 
         do
         {
-            if (SSL_CTX_use_certificate_file(_sslContext, "/share/test.pem"
+            if (SSL_CTX_use_certificate_file(_sslContext, 
+#ifdef _DEBUG
+                "/share/test.pem"
+#else
+                certPath
+#endif
                 , SSL_FILETYPE_PEM) <= 0)
             {
                 cout << "failed: cert file not found" << endl;
@@ -189,7 +219,12 @@ void VUsbServer::init_openssl()
                 break;
             }
 
-            if (SSL_CTX_use_PrivateKey_file(_sslContext, "/share/key.pem"
+            if (SSL_CTX_use_PrivateKey_file(_sslContext, 
+#ifdef _DEBUG
+                "/share/key.pem"
+#else
+                keyPath
+#endif
                 , SSL_FILETYPE_PEM) <= 0)
             {
                 cout << "failed: private key file not found" << endl;

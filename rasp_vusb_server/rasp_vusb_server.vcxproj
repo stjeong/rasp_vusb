@@ -36,7 +36,7 @@
     <IncludePath>c:\linux\include;c:\linux\include\x86_64-linux-gnu;E:\git_clone\vcpkg\packages\openssl_x86-windows\include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <IncludePath>c:\linux\include;c:\linux\include\x86_64-linux-gnu;$(IncludePath)</IncludePath>
+    <IncludePath>c:\linux\include;c:\linux\include\x86_64-linux-gnu;E:\git_clone\vcpkg\packages\openssl_x86-windows\include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>

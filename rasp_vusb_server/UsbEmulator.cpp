@@ -15,9 +15,7 @@ UsbEmulator::~UsbEmulator()
 
 void UsbEmulator::Open()
 {
-#if defined(WIN32)
-#else
-    char *filename = "/dev/hidg0";
+    char const *filename = "/dev/hidg0";
 
     int fd = open(filename, O_RDWR, 0666);
     if (fd == -1)
@@ -28,13 +26,10 @@ void UsbEmulator::Open()
 
     printf("keyboard/mouse opened\n");
     _fd = fd;
-#endif
 }
 
 void UsbEmulator::Close()
 {
-#if defined(WIN32)
-#else
     if (_fd <= 0)
     {
         return;
@@ -42,7 +37,6 @@ void UsbEmulator::Close()
 
     close(_fd);
     _fd = 0;
-#endif
 }
 
 void UsbEmulator::Enqueue(char *buffer, int bufLen)

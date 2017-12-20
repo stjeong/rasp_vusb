@@ -14,14 +14,10 @@ IPResolver::~IPResolver()
 
 void IPResolver::dispose()
 {
-#if defined(WIN32)
-    ::closesocket(_sock);
-#else
     if (_sock != 0)
     {
         ::close(_sock);
     }
-#endif
 
     _sock = 0;
 }
@@ -66,11 +62,8 @@ void IPResolver::startService()
 
 bool IPResolver::open()
 {
-#if defined(WIN32)
-    _sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-#else
     _sock = socket(AF_INET, SOCK_DGRAM, 0);
-#endif
+
     if (_sock < 0) {
         perror("IPResolver::open - sock error\n");
         return false;

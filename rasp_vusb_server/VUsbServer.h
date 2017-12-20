@@ -44,9 +44,13 @@ private:
 
     SSL_CTX *_sslContext;
 
+    char _modulePath[PATH_MAX + 1];
+
     bool ReadData(SSL *ssl, char *buf, int len);
     void init_openssl();
     void cleanup_openssl();
     void free_sslctx();
+
+    void get_module_path(char modulePath[]);
 };
 

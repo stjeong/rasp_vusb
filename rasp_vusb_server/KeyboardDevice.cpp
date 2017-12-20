@@ -12,9 +12,6 @@ KeyboardDevice::~KeyboardDevice()
 
 void KeyboardDevice::Send(int fd, char *keyInput, int keyLen)
 {
-#if defined(WIN32)
-
-#else
     if (fd <= 0)
     {
         perror("keyboard: not opened");
@@ -44,5 +41,4 @@ void KeyboardDevice::Send(int fd, char *keyInput, int keyLen)
             return;
         }
     }
-#endif
 }
