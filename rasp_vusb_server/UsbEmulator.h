@@ -14,7 +14,7 @@ public:
     UsbEmulator();
     ~UsbEmulator();
 
-    void Enqueue(char *buffer, int bufLen);
+    bool Enqueue(char *buffer, int bufLen);
     void Run();
     void Open();
     void Close();

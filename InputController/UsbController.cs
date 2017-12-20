@@ -23,6 +23,9 @@ namespace InputController
         KeyboardDevice _keyboard;
         MouseDevice _mouse;
 
+        public const int SHUTDOWN_SHELL_CMD = 0x04;
+        public const int ACK_RESPONSE_CMD = 0x08;
+
         public event EventHandler<IPEndPoint> Connected;
 
         public bool IsConnected
@@ -126,10 +129,22 @@ namespace InputController
             buf.Add(0);
             buf.Add(0);
 
-            buf.Add(0x04); // SHUTDOWN_SHELL_CMD
+            buf.Add(SHUTDOWN_SHELL_CMD);
             Send(buf.ToArray());
-
+            WaitForAck();
+                        
             CloseSocket();
+        }
+
+        private void WaitForAck()
+        {
+            if (_controlSocket == null)
+            {
+                return;
+            }
+
+            byte[] buf = new byte[1];
+            _sslStream.Read(buf, 0, 1);
         }
 
         void Send(byte[] buffer)

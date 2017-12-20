@@ -47,10 +47,11 @@ private:
     char _modulePath[PATH_MAX + 1];
 
     bool ReadData(SSL *ssl, char *buf, int len);
+    void SendAck(SSL *pSsl);
     void init_openssl();
     void cleanup_openssl();
     void free_sslctx();
 
-    void get_module_path(char modulePath[]);
+    void get_module_dir_path(char modulePath[]);
 };
 

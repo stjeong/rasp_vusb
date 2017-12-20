@@ -9,7 +9,7 @@ VUsbServer::VUsbServer()
     _sock = 0;
     _sslContext = nullptr;
 
-    get_module_path(_modulePath);
+    get_module_dir_path(_modulePath);
 
     init_openssl();
     _emulator.Run();
@@ -21,12 +21,11 @@ VUsbServer::~VUsbServer()
     cleanup_openssl();
 }
 
-void VUsbServer::get_module_path(char modulePath[])
+void VUsbServer::get_module_dir_path(char modulePath[])
 {
-    char arg1[20];
+    char arg1[] = "/proc/self/exe";
     char exepath[PATH_MAX + 1] = { 0 };
 
-    sprintf(arg1, "/proc/%d/exe", getpid());
     readlink(arg1, exepath, PATH_MAX);
     strcpy(modulePath, dirname(exepath));
 
@@ -155,7 +154,11 @@ void VUsbServer::startService()
                         break;
                     }
 
-                    emulator.Enqueue(buf, packetLen);
+                    if (emulator.Enqueue(buf, packetLen) == false)
+                    {
+                        SendAck(pSsl);
+                        break;
+                    }
                 }
 
                 if (pSsl != nullptr)
@@ -178,6 +181,12 @@ void VUsbServer::startService()
     });
 
     t.detach();
+}
+
+void VUsbServer::SendAck(SSL *pSsl)
+{
+    char buf[] = { ACK_RESPONSE_CMD };
+    SSL_write(pSsl, buf, 1);
 }
 
 void VUsbServer::init_openssl()

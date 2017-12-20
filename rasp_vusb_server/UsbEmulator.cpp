@@ -39,8 +39,20 @@ void UsbEmulator::Close()
     _fd = 0;
 }
 
-void UsbEmulator::Enqueue(char *buffer, int bufLen)
+bool UsbEmulator::Enqueue(char *buffer, int bufLen)
 {
+    if (bufLen <= 0)
+    {
+        return false;
+    }
+
+    if (buffer[0] == SHUTDOWN_SHELL_CMD)
+    {
+        cout << "shutting down..." << endl;
+        system("sudo shutdown -h now");
+        return false;
+    }
+
     QueueItem input;
 
     input.item = new char[bufLen];
@@ -50,6 +62,8 @@ void UsbEmulator::Enqueue(char *buffer, int bufLen)
     _queue.Add(input);
 
     _event.Set();
+
+    return true;
 }
 
 void UsbEmulator::Run()
@@ -66,7 +80,6 @@ void UsbEmulator::Run()
                 ProcessUsbInput(input);
                 input.Dispose();
             }
-
         }
     });
 
@@ -93,10 +106,5 @@ void UsbEmulator::ProcessUsbInput(QueueItem buf)
     else if (cmdByte == ABS_MOUSE_INPUT_CMD)
     {
         _mouse.SendAbsolute(_fd, buf.item + 1, buf.itemLen - 1);
-    }
-    else if (cmdByte == SHUTDOWN_SHELL_CMD)
-    {
-        cout << "shutting down..." << endl;
-        system("sudo shutdown -h now");
     }
 }
