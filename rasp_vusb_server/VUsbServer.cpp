@@ -212,18 +212,21 @@ void VUsbServer::init_openssl()
     {
         SSL_CTX_set_options(_sslContext, SSL_OP_SINGLE_DH_USE);
         bool initialized = true;
+        int sslResult = 0;
 
         do
         {
-            if (SSL_CTX_use_certificate_file(_sslContext, 
+            sslResult = SSL_CTX_use_certificate_file(_sslContext,
 #ifdef _DEBUG
                 "/share/test.pem"
 #else
                 certPath
 #endif
-                , SSL_FILETYPE_PEM) <= 0)
+                , SSL_FILETYPE_PEM);
+
+            if (sslResult <= 0)
             {
-                cout << "failed: cert file not found" << endl;
+                cout << "failed: cert file not found - " << ERR_error_string(ERR_get_error(), nullptr) << endl;
                 initialized = false;
                 break;
             }

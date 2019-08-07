@@ -34,7 +34,7 @@ namespace InputController
                 new EventWaitHandle(false, EventResetMode.ManualReset, typeof(Program).Name).Set();
 
                 int delay = 15;
-                while (delay -- > 0)
+                while (delay-- > 0)
                 {
                     Console.Write(".");
                     Thread.Sleep(1000);
@@ -70,7 +70,7 @@ namespace InputController
             _usbController.Connected += UsbController_Connected;
             _usbController.ActivateFindService();
 
-            bool mouseMode = true;
+            bool mouseMode = false;
 
             int cmdIndex = EventWaitHandle.WaitAny(new WaitHandle[] { _exitEvent, _ewh });
             if (cmdIndex == 0)
@@ -136,6 +136,12 @@ namespace InputController
             }
 
             return true;
+        }
+
+        private void Delay(Random rd, int min, int max)
+        {
+            int delay = rd.Next(min, max);
+            Thread.Sleep(delay);
         }
 
         private void KeyboardTest()
