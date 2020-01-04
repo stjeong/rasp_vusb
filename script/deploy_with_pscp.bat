@@ -5,13 +5,14 @@ REM In order to run this script, make /share directory in Raspberry PI "sudo mkd
 IF '%1' == '' GOTO ERROR_ARG
 
 SET PIADDR=%1
+SET CURRENT_VERSION=v1_0_0_3
 
 FOR /F %%I IN ("%0") DO SET CURRENTDIR=%%~dpI
 
 pscp %CURRENTDIR%\*.* pi@%PIADDR%:/share
 if errorlevel 1 GOTO ERROR_PSCP
 
-pscp %CURRENTDIR%\..\bin\v1_0_0_2\rasp_vusb_server.out pi@%PIADDR%:/share
+pscp %CURRENTDIR%\..\bin\%CURRENT_VERSION%\rasp_vusb_server.out pi@%PIADDR%:/share
 if errorlevel 1 GOTO ERROR_PSCP
 
 GOTO END_OF_SCRIPT

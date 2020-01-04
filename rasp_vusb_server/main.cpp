@@ -3,6 +3,8 @@
 #include "VUsbServer.h"
 #include "IPResolver.h"
 
+#if defined(WIN32)
+#else
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -11,14 +13,34 @@
 #include <unistd.h>
 #include <signal.h>
 #include <linux/limits.h>
+#endif
+
+/*
+
+On raspberry pi:
+    # apt install build-essential
+    # apt install libbluetooth-dev
+    # apt install libssl-dev
+
+*/
 
 int work(bool inConsole)
 {
+#if defined(WIN32)
+    inConsole = true;
+
+    WORD wVersionRequested = MAKEWORD(2, 2);
+    WSADATA wsaData;
+
+    ::WSAStartup(wVersionRequested, &wsaData);
+#endif
+
     IPResolver ipResolver;
     VUsbServer usbServer;
 
     if (ipResolver.open() == false)
     {
+        cout << "ipResolver.open failed" << endl;
         return -1;
     }
 
@@ -43,11 +65,18 @@ int work(bool inConsole)
     }
     else
     {
+#if defined(WIN32)
+#else
         while (true)
         {
             sleep(1);
         }
+#endif
     }
+
+#if defined(WIN32)
+    WSACleanup();
+#endif
 
     ipResolver.dispose();
     usbServer.dispose();
@@ -58,31 +87,35 @@ int work(bool inConsole)
 int main(int argc, char **argv)
 {
     bool isConsole = argc >= 2;
+#if defined(WIN32)
+#else
 
     if (isConsole == false)
     {
         pid_t pid = fork();
-        printf("pid = [%d] \n", pid);
+        printf("fork-pid = [%d] \n", pid);
 
         if (pid < 0)
         {
+            printf("(pid < 0) exiting...\n");
             exit(0);
         }
         else if (pid > 0)
         {
+            printf("(pid > 0) exiting...\n");
             exit(0);
         }
+        
+        printf("(pid == 0) working...\n");
 
         signal(SIGHUP, SIG_IGN);
 
-#if !defined(_NR_OPEN)
-#define NR_OPEN	1024
-#endif
+        printf("signalled...\n");
 
-        for (int i = 0; i < NR_OPEN; i++)
-        {
-            close(i);
-        }
+        //for (int i = 0; i < NR_OPEN; i++)
+        //{
+        //    close(i);
+        //}
 
         open("/dev/null", O_RDWR);
         dup(0);
@@ -93,5 +126,8 @@ int main(int argc, char **argv)
         setsid();
     }
 
+#endif
+
+    printf("starting...\n");
     work(isConsole);
 }

@@ -58,6 +58,7 @@
     </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BluetoothResolver.cpp" />
     <ClCompile Include="IPResolver.cpp" />
     <ClCompile Include="KeyboardDevice.cpp" />
     <ClCompile Include="main.cpp" />
@@ -66,6 +67,7 @@
     <ClCompile Include="VUsbServer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BluetoothResolver.h" />
     <ClInclude Include="IPResolver.h" />
     <ClInclude Include="KeyboardDevice.h" />
     <ClInclude Include="MouseDevice.h" />

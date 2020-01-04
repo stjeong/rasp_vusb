@@ -49,7 +49,7 @@ bool UsbEmulator::Enqueue(char *buffer, int bufLen)
     if (buffer[0] == SHUTDOWN_SHELL_CMD)
     {
         cout << "shutting down..." << endl;
-        system("sudo shutdown -h now");
+        system("sudo shutdown now");
         return false;
     }
 
