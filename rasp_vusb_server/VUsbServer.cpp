@@ -60,7 +60,7 @@ bool VUsbServer::open()
     _server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     _server_addr.sin_port = htons((PORT + 1));
 
-    int ret = ::bind(_sock, (struct sockaddr*)&_server_addr, addr_len);
+    int ret = ::bind(_sock, (struct sockaddr*) & _server_addr, addr_len);
     if (ret < 0) {
         perror("VUsbServer::open - bind error\n");
         return false;
@@ -71,14 +71,14 @@ bool VUsbServer::open()
     return true;
 }
 
-bool VUsbServer::ReadData(SSL *ssl, char *buf, int len)
+bool VUsbServer::ReadData(SSL* ssl, char* buf, int len)
 {
     int totalRead = len;
 
     while (totalRead > 0)
     {
         // int readBytes = recv(socket, buf, len, 0);
-        int readBytes = SSL_read(ssl, (char *)buf, len);
+        int readBytes = SSL_read(ssl, (char*)buf, len);
 
         if (readBytes <= 0)
         {
@@ -99,91 +99,91 @@ bool VUsbServer::ReadData(SSL *ssl, char *buf, int len)
 void VUsbServer::startService()
 {
     thread t([&]()
-    {
-        struct sockaddr_in server_socket;
-        socklen_t addr_len = sizeof(server_socket);
-
-        while (true)
         {
-            int clntSocket = accept(_sock, (struct sockaddr *)&server_socket, &addr_len);
+            struct sockaddr_in server_socket;
+            socklen_t addr_len = sizeof(server_socket);
 
-            SSL *ssl = nullptr;
-            ssl = SSL_new(_sslContext);
-            SSL_set_fd(ssl, clntSocket);
-            int ssl_err = SSL_accept(ssl);
-            if (ssl_err <= 0)
+            while (true)
             {
-                break;
+                int clntSocket = accept(_sock, (struct sockaddr*) & server_socket, &addr_len);
+
+                SSL* ssl = nullptr;
+                ssl = SSL_new(_sslContext);
+                SSL_set_fd(ssl, clntSocket);
+                int ssl_err = SSL_accept(ssl);
+                if (ssl_err <= 0)
+                {
+                    break;
+                }
+
+                thread clntThread([this](int connectedSocket, UsbEmulator& emulator, SSL* pSsl)
+                    {
+                        char buf[4096];
+
+                        while (true)
+                        {
+                            memset(buf, 0, sizeof(buf));
+
+                            // get length of packet
+                            bool result = ReadData(pSsl, buf, 4);
+                            if (result == false)
+                            {
+                                break;
+                            }
+
+                            int packetLen = *(int*)buf;
+
+                            if (packetLen > 4096)
+                            {
+                                ReadData(pSsl, buf, packetLen);
+                                printf("dropped long packet = size(%d)\n", packetLen);
+                                break;
+                            }
+
+                            result = ReadData(pSsl, buf, packetLen);
+                            if (result == false)
+                            {
+                                printf("can't read = len(%d)\n", packetLen);
+                                break;
+                            }
+
+                            printf("recvBytes == %d\n", packetLen);
+
+                            if (packetLen <= 0)
+                            {
+                                break;
+                            }
+
+                            if (emulator.Enqueue(buf, packetLen) == false)
+                            {
+                                SendAck(pSsl);
+                                break;
+                            }
+                        }
+
+                        if (pSsl != nullptr)
+                        {
+                            printf("SSL_free\n");
+                            SSL_free(pSsl);
+                            printf("completed: SSL_free\n");
+                        }
+
+                        if (connectedSocket > 0)
+                        {
+                            ::close(connectedSocket);
+                        }
+
+                    }, clntSocket, std::ref(_emulator), ssl);
+
+                clntThread.detach();
             }
 
-            thread clntThread([this](int connectedSocket, UsbEmulator &emulator, SSL *pSsl)
-            {
-                char buf[4096];
-
-                while (true)
-                {
-                    memset(buf, 0, sizeof(buf));
-
-                    // get length of packet
-                    bool result = ReadData(pSsl, buf, 4);
-                    if (result == false)
-                    {
-                        break;
-                    }
-
-                    int packetLen = *(int *)buf;
-
-                    if (packetLen > 4096)
-                    {
-                        ReadData(pSsl, buf, packetLen);
-                        printf("dropped long packet = size(%d)\n", packetLen);
-                        break;
-                    }
-
-                    result = ReadData(pSsl, buf, packetLen);
-                    if (result == false)
-                    {
-                        printf("can't read = len(%d)\n", packetLen);
-                        break;
-                    }
-
-                    printf("recvBytes == %d\n", packetLen);
-
-                    if (packetLen <= 0)
-                    {
-                        break;
-                    }
-
-                    if (emulator.Enqueue(buf, packetLen) == false)
-                    {
-                        SendAck(pSsl);
-                        break;
-                    }
-                }
-
-                if (pSsl != nullptr)
-                {
-                    printf("SSL_free\n");
-                    SSL_free(pSsl);
-                    printf("completed: SSL_free\n");
-                }
-
-                if (connectedSocket > 0)
-                {
-                    ::close(connectedSocket);
-                }
-
-            }, clntSocket, std::ref(_emulator), ssl);
-
-            clntThread.detach();
-        }
-
-    });
+        });
 
     t.detach();
 }
 
-void VUsbServer::SendAck(SSL *pSsl)
+void VUsbServer::SendAck(SSL* pSsl)
 {
     char buf[] = { ACK_RESPONSE_CMD };
     SSL_write(pSsl, buf, 1);
@@ -208,51 +208,53 @@ void VUsbServer::init_openssl()
     sprintf(keyPath, "%s/%s", _modulePath, "key.pem");
 #endif
 
-    if (_sslContext != nullptr)
+    if (_sslContext == nullptr)
     {
-        SSL_CTX_set_options(_sslContext, SSL_OP_SINGLE_DH_USE);
-        bool initialized = true;
-        int sslResult = 0;
+        return;
+    }
 
-        do
-        {
-            sslResult = SSL_CTX_use_certificate_file(_sslContext,
+    SSL_CTX_set_options(_sslContext, SSL_OP_SINGLE_DH_USE);
+    bool initialized = true;
+    int sslResult = 0;
+
+    do
+    {
+        sslResult = SSL_CTX_use_certificate_file(_sslContext,
 #ifdef _DEBUG
-                "/share/test.pem"
+            "/share/test.pem"
 #else
-                certPath
+            certPath
 #endif
-                , SSL_FILETYPE_PEM);
+            , SSL_FILETYPE_PEM);
 
-            if (sslResult <= 0)
-            {
-                cout << "failed: cert file not found - " << ERR_error_string(ERR_get_error(), nullptr) << endl;
-                initialized = false;
-                break;
-            }
-
-            if (SSL_CTX_use_PrivateKey_file(_sslContext, 
-#ifdef _DEBUG
-                "/share/key.pem"
-#else
-                keyPath
-#endif
-                , SSL_FILETYPE_PEM) <= 0)
-            {
-                cout << "failed: private key file not found" << endl;
-                initialized = false;
-                break;
-            }
-
-            cout << "completed: init_openssl" << endl;
-
-        } while (false);
-
-        if (initialized == false)
+        if (sslResult <= 0)
         {
-            cout << "failed: init_openssl" << endl;
-            free_sslctx();
+            cout << "failed: cert file not found - " << ERR_error_string(ERR_get_error(), nullptr) << endl;
+            initialized = false;
+            break;
         }
+
+        if (SSL_CTX_use_PrivateKey_file(_sslContext,
+#ifdef _DEBUG
+            "/share/key.pem"
+#else
+            keyPath
+#endif
+            , SSL_FILETYPE_PEM) <= 0)
+        {
+            cout << "failed: private key file not found" << endl;
+            initialized = false;
+            break;
+        }
+
+        cout << "completed: init_openssl" << endl;
+
+    } while (false);
+
+    if (initialized == false)
+    {
+        cout << "failed: init_openssl" << endl;
+        free_sslctx();
     }
 }
 
