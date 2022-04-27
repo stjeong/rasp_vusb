@@ -26,10 +26,16 @@ void VUsbServer::get_module_dir_path(char modulePath[])
     char arg1[] = "/proc/self/exe";
     char exepath[PATH_MAX + 1] = { 0 };
 
-    readlink(arg1, exepath, PATH_MAX);
-    strcpy(modulePath, dirname(exepath));
-
-    printf("module path: %s\n", modulePath);
+    ssize_t result = readlink(arg1, exepath, PATH_MAX);
+    if (result < 0)
+    {
+        printf("module path not found: %s\n", arg1);
+    }
+    else
+    {
+        strcpy(modulePath, dirname(exepath));
+        printf("module path: %s\n", modulePath);
+    }
 }
 
 void VUsbServer::dispose()

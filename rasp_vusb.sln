@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29215.179
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rasp_vusb_server", "rasp_vusb_server\rasp_vusb_server.vcxproj", "{44EE9842-C501-483E-8AF9-6679E03AF400}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InputController", "InputController\InputController.csproj", "{E0523B6E-9F26-46A1-8F67-3A3A886C9BDB}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rasp_vusb_server_test", "rasp_vusb_server_test\rasp_vusb_server_test.vcxproj", "{02B2DCAC-BEA9-4617-952A-47741A93C64E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{807B0BF5-1419-433F-B462-158F88D6477F}"
 	ProjectSection(SolutionItems) = preProject
@@ -62,9 +60,9 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{44EE9842-C501-483E-8AF9-6679E03AF400}.Debug|Any CPU.ActiveCfg = Debug|ARM
-		{44EE9842-C501-483E-8AF9-6679E03AF400}.Debug|Any CPU.Build.0 = Debug|ARM
-		{44EE9842-C501-483E-8AF9-6679E03AF400}.Debug|Any CPU.Deploy.0 = Debug|ARM
+		{44EE9842-C501-483E-8AF9-6679E03AF400}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{44EE9842-C501-483E-8AF9-6679E03AF400}.Debug|Any CPU.Build.0 = Debug|x64
+		{44EE9842-C501-483E-8AF9-6679E03AF400}.Debug|Any CPU.Deploy.0 = Debug|x64
 		{44EE9842-C501-483E-8AF9-6679E03AF400}.Debug|ARM.ActiveCfg = Debug|ARM
 		{44EE9842-C501-483E-8AF9-6679E03AF400}.Debug|x64.ActiveCfg = Debug|ARM
 		{44EE9842-C501-483E-8AF9-6679E03AF400}.Debug|x86.ActiveCfg = Debug|ARM
@@ -90,19 +88,6 @@ Global
 		{E0523B6E-9F26-46A1-8F67-3A3A886C9BDB}.Release|x64.Build.0 = Release|Any CPU
 		{E0523B6E-9F26-46A1-8F67-3A3A886C9BDB}.Release|x86.ActiveCfg = Release|Any CPU
 		{E0523B6E-9F26-46A1-8F67-3A3A886C9BDB}.Release|x86.Build.0 = Release|Any CPU
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Debug|ARM.ActiveCfg = Debug|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Debug|ARM.Build.0 = Debug|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Debug|x64.ActiveCfg = Debug|x64
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Debug|x64.Build.0 = Debug|x64
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Debug|x86.ActiveCfg = Debug|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Debug|x86.Build.0 = Debug|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Release|Any CPU.ActiveCfg = Release|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Release|ARM.ActiveCfg = Release|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Release|x64.ActiveCfg = Release|x64
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Release|x64.Build.0 = Release|x64
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Release|x86.ActiveCfg = Release|Win32
-		{02B2DCAC-BEA9-4617-952A-47741A93C64E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -33,7 +33,7 @@ void KeyboardDevice::Send(int fd, char *keyInput, int keyLen)
         keyPress[1] = keyInput[i];
         keyPress[3] = keyInput[i + 1];
 
-        int result = write(fd, keyPress, 8);
+        ssize_t result = write(fd, keyPress, 8);
         if (result != 8)
         {
             printf("result == %d\n", result);

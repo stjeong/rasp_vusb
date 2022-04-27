@@ -50,7 +50,12 @@ bool UsbEmulator::Enqueue(char *buffer, int bufLen)
     {
         printf("shutting down...\n");
         // cout << "shutting down..." << endl;
-        system("sudo shutdown now");
+        int result = system("sudo shutdown now");
+        if (result < 0)
+        {
+            printf("shutdown failed\n");
+        }
+
         return false;
     }
 

@@ -118,10 +118,20 @@ int main(int argc, char **argv)
         //}
 
         open("/dev/null", O_RDWR);
-        dup(0);
-        dup(0);
+        if (dup(0) < 0)
+        {
+            exit(0);
+        }
 
-        chdir("/");
+        if (dup(0) < 0)
+        {
+            exit(0);
+        }
+
+        if (chdir("/") < 0)
+        {
+            exit(0);
+        }
 
         setsid();
     }

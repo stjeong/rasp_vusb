@@ -42,7 +42,7 @@ void IPResolver::startService()
                 if (FD_ISSET(_sock, &readfd)) 
                 {
                     memset(buffer, 0, sizeof(buffer));
-                    int recvByets = recvfrom(_sock, buffer, 1024, 0, (struct sockaddr*)&client_addr, &addr_len);
+                    ssize_t recvByets = recvfrom(_sock, buffer, 1024, 0, (struct sockaddr*)&client_addr, &addr_len);
 
                     if (recvByets != 0 && strcmp(buffer, IP_FOUND) == 0)
                     {
